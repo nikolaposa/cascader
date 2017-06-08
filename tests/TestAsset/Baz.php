@@ -20,13 +20,8 @@ class Baz
      * @var bool
      */
     public $isActive;
-
-    /**
-     * @param string $name
-     * @param int $count
-     * @param bool $isActive
-     */
-    public function __construct($name, $count = 3, $isActive = true)
+    
+    public function __construct(string $name, int $count = 3, $isActive = true)
     {
         $this->name = $name;
         $this->count = $count;

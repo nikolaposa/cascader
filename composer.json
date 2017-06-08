@@ -1,6 +1,6 @@
 {
     "name": "nikolaposa/cascader",
-    "description": "Create PHP objects from an array of options",
+    "description": "Utility for cascade creation of PHP objects from their array definitions.",
     "type": "library",
     "license": "MIT",
     "keywords": [

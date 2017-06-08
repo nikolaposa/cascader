@@ -63,14 +63,4 @@ class Options
 
         return $this->options[$key];
     }
-
-    final public function toArray() : array
-    {
-        return $this->options;
-    }
-
-    final public function toArgs() : array
-    {
-        return array_values($this->options);
-    }
 }

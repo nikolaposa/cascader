@@ -6,7 +6,7 @@
 [![Latest Version][ico-version]][link-packagist]
 [![PDS Skeleton][ico-pds]][link-pds]
 
-Cascader enables creation of objects from an array of options that maps to constructor parameters.
+Cascader enables creation of PHP objects from their array definitions. Given the class name and options array that correspond to constructor parameters, it will create target object along with a cascade of nested objects.
 
 ## Installation
 
@@ -19,7 +19,18 @@ composer require nikolaposa/cascader
 ## Usage
 
 ``` php
-//TODO
+$object = Cascader::create(Foo::class, [
+    'bar' => [
+        'baz' => [
+            'name' => 'test',
+            'count' => 10,
+        ],
+        'config' => [
+            'key1' => 'val1',
+            'key2' => 'val2',
+        ],
+    ],
+]);
 ```
 
 ## Credits

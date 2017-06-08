@@ -7,7 +7,7 @@ namespace Cascader\Tests\TestAsset;
 class Bar
 {
     /**
-     * @var Bar
+     * @var Baz
      */
     public $baz;
 
@@ -16,7 +16,7 @@ class Bar
      */
     public $config;
 
-    public function __construct(Bar $baz, array $config)
+    public function __construct(Baz $baz, array $config)
     {
         $this->baz = $baz;
         $this->config = $config;

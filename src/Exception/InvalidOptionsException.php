@@ -12,4 +12,13 @@ class InvalidOptionsException extends InvalidArgumentException implements Except
     {
         return new static('Options should be in form of an associate array (string keys)');
     }
+
+    public static function forMissingMandatoryParameter(string $className, string $parameterName)
+    {
+        return new static(sprintf(
+            'Mandatory parameter: \'%2$s\' of class: %1$s is missing from options',
+            $className,
+            $parameterName
+        ));
+    }
 }

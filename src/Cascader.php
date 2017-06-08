@@ -6,11 +6,21 @@ namespace Cascader;
 
 use BetterReflection\Reflection\ReflectionClass;
 use Cascader\Exception\InvalidClassException;
+use Cascader\Exception\InvalidOptionsException;
 use Cascader\Exception\OptionNotSetException;
 use phpDocumentor\Reflection\Types\Object_;
 
 class Cascader
 {
+    /**
+     * @param string $className
+     * @param array $options
+     *
+     * @throws InvalidClassException
+     * @throws InvalidOptionsException
+     *
+     * @return object
+     */
     public static function create(string $className, array $options)
     {
         if (!class_exists($className)) {
@@ -20,56 +30,53 @@ class Cascader
         $reflectionClass = ReflectionClass::createFromName($className);
 
         if (!$reflectionClass->isInstantiable()) {
-            throw InvalidClassException::forNonExistingClass($className);
+            throw InvalidClassException::forNonInstantiableClass($className);
         }
 
         $options = Options::fromArray($options);
-        $objectParameters = ObjectParameters::fromReflectionClass($reflectionClass);
 
-        $options = self::marshalOptions($options, $objectParameters);
+        $arguments = self::marshalArguments($options, $reflectionClass);
 
-        return new $className(...$options->toArgs());
+        return new $className(...$arguments);
     }
 
-    protected static function marshalOptions(Options $options, ObjectParameters $objectParameters) : Options
+    protected static function marshalArguments(Options $options, ReflectionClass $reflectionClass) : array
     {
-        $newOptions = [];
+        if (!$reflectionClass->hasMethod('__construct')) {
+            return [];
+        }
 
-        foreach ($objectParameters->getAll() as $parameter) {
+        $arguments = [];
+
+        $className = $reflectionClass->getName();
+        $constructorParameters = $reflectionClass->getConstructor()->getParameters();
+
+        foreach ($constructorParameters as $parameter) {
             /* @var $parameter \BetterReflection\Reflection\ReflectionParameter */
             $parameterName = $parameter->getName();
 
-            $option = null;
-            $hasOption = true;
+            $argument = null;
             try {
-                $option = $options->get($parameterName);
-            } catch (OptionNotSetException $ex) {
-                $hasOption = false;
-            }
+                $argument = $options->get($parameterName);
 
-            if (!$hasOption) {
-                if (!$parameter->isOptional()) {
-                    //throw
-                }
-
-                $option = $parameter->getDefaultValue();
-            } else {
                 if (null !== ($parameterType = $parameter->getType())) {
-                    $optionType = is_object($option) ? get_class($option) : gettype($option);
+                    $parameterTypeObject = $parameterType->getTypeObject();
 
-                    if ($optionType !== (string) $parameterType) {
-                        if (is_array($option) && $parameterType instanceof Object_) {
-                            $option = static::create($parameterType->getFqsen(), $option);
-                        } else {
-                            //throw
-                        }
+                    if (is_array($argument) && $parameterTypeObject instanceof Object_) {
+                        $argument = static::create((string) $parameterTypeObject->getFqsen(), $argument);
                     }
                 }
+            } catch (OptionNotSetException $ex) {
+                if (!$parameter->isOptional()) {
+                    throw InvalidOptionsException::forMissingMandatoryParameter($className, $parameterName);
+                }
+
+                $argument = $parameter->getDefaultValue();
             }
 
-            $newOptions[$parameterName] = $option;
+            $arguments[] = $argument;
         }
 
-        return Options::fromArray($newOptions);
+        return $arguments;
     }
 }
