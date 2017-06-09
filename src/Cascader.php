@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Cascader;
 
 use BetterReflection\Reflection\ReflectionClass;
+use BetterReflection\Reflection\ReflectionParameter;
 use Cascader\Exception\InvalidClassException;
 use Cascader\Exception\InvalidOptionsException;
 use Cascader\Exception\OptionNotSetException;
@@ -21,62 +22,68 @@ class Cascader
      *
      * @return object
      */
-    public static function create(string $className, array $options)
+    public function create(string $className, array $options)
     {
-        if (!class_exists($className)) {
+        $reflectionClass = $this->getReflectionClass($className);
+        $options = Options::fromArray($options);
+
+        $arguments = $this->marshalArguments($reflectionClass, $options);
+
+        return new $className(...$arguments);
+    }
+
+    protected function getReflectionClass(string $className)
+    {
+        if (! class_exists($className)) {
             throw InvalidClassException::forNonExistingClass($className);
         }
 
         $reflectionClass = ReflectionClass::createFromName($className);
 
-        if (!$reflectionClass->isInstantiable()) {
+        if (! $reflectionClass->isInstantiable()) {
             throw InvalidClassException::forNonInstantiableClass($className);
         }
 
-        $options = Options::fromArray($options);
-
-        $arguments = self::marshalArguments($options, $reflectionClass);
-
-        return new $className(...$arguments);
+        return $reflectionClass;
     }
 
-    protected static function marshalArguments(Options $options, ReflectionClass $reflectionClass) : array
+    protected function marshalArguments(ReflectionClass $reflectionClass, Options $options) : array
     {
-        if (!$reflectionClass->hasMethod('__construct')) {
+        if (! $reflectionClass->hasMethod('__construct')) {
             return [];
         }
 
         $arguments = [];
 
-        $className = $reflectionClass->getName();
         $constructorParameters = $reflectionClass->getConstructor()->getParameters();
 
         foreach ($constructorParameters as $parameter) {
-            /* @var $parameter \BetterReflection\Reflection\ReflectionParameter */
-            $parameterName = $parameter->getName();
-
-            $argument = null;
-            try {
-                $argument = $options->get($parameterName);
-
-                if (null !== ($parameterType = $parameter->getType())) {
-                    $parameterTypeObject = $parameterType->getTypeObject();
-
-                    if (is_array($argument) && $parameterTypeObject instanceof Object_) {
-                        $argument = static::create((string) $parameterTypeObject->getFqsen(), $argument);
-                    }
-                }
-            } catch (OptionNotSetException $ex) {
-                if (!$parameter->isOptional()) {
-                    throw InvalidOptionsException::forMissingMandatoryParameter($className, $parameterName);
-                }
-
-                $argument = $parameter->getDefaultValue();
-            }
-
-            $arguments[] = $argument;
+            $arguments[] = $this->resolveArgument($parameter, $options);
         }
 
         return $arguments;
+    }
+
+    protected function resolveArgument(ReflectionParameter $parameter, Options $options)
+    {
+        try {
+            $argument = $options->get($parameter->getName());
+
+            if (null !== ($parameterType = $parameter->getType())) {
+                $parameterTypeObject = $parameterType->getTypeObject();
+
+                if (is_array($argument) && $parameterTypeObject instanceof Object_) {
+                    $argument = $this->create((string) $parameterTypeObject->getFqsen(), $argument);
+                }
+            }
+
+            return $argument;
+        } catch (OptionNotSetException $ex) {
+            if (! $parameter->isOptional()) {
+                throw InvalidOptionsException::forMissingMandatoryParameter($parameter);
+            }
+
+            return $parameter->getDefaultValue();
+        }
     }
 }

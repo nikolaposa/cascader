@@ -21,22 +21,22 @@ class Options
 
     public static function fromArray(array $options)
     {
-        self::validateOptions($options);
-        $options = self::normalizeOptions($options);
+        self::validate($options);
+        $options = self::normalize($options);
 
         return new static($options);
     }
 
-    final protected static function validateOptions(array $options)
+    final protected static function validate(array $options)
     {
         foreach ($options as $key => $value) {
-            if (!is_string($key)) {
+            if (! is_string($key)) {
                 throw InvalidOptionsException::forInvalidKeys();
             }
         }
     }
 
-    final protected static function normalizeOptions(array $options) : array
+    final protected static function normalize(array $options) : array
     {
         $normalizedOptions = [];
 
@@ -57,7 +57,7 @@ class Options
 
     public function get(string $key)
     {
-        if (!$this->has($key)) {
+        if (! $this->has($key)) {
             throw OptionNotSetException::forKey($key);
         }
 

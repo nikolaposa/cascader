@@ -4,22 +4,32 @@ declare(strict_types=1);
 
 namespace Cascader\Tests;
 
-use Cascader\Exception\InvalidOptionsException;
 use PHPUnit\Framework\TestCase;
 use Cascader\Cascader;
 use Cascader\Tests\TestAsset\Foo;
 use Cascader\Tests\TestAsset\Bar;
 use Cascader\Tests\TestAsset\Baz;
 use Cascader\Tests\TestAsset\MyClass;
+use Cascader\Exception\InvalidOptionsException;
 
 class CascaderTest extends TestCase
 {
     /**
+     * @var Cascader
+     */
+    protected $cascader;
+
+    protected function setUp()
+    {
+        $this->cascader = new Cascader();
+    }
+
+    /**
      * @test
      */
-    public function it_creates_object_with_scalar_options()
+    public function it_creates_object_with_simple_creation_options()
     {
-        $object = Cascader::create(Baz::class, [
+        $object = $this->cascader->create(Baz::class, [
             'name' => 'test',
             'count' => 10,
         ]);
@@ -32,10 +42,10 @@ class CascaderTest extends TestCase
     /**
      * @test
      */
-    public function it_raises_exception_if_options_is_not_associative_array()
+    public function it_raises_exception_if_creation_options_is_not_associative_array()
     {
         try {
-            Cascader::create(Baz::class, ['invalid']);
+            $this->cascader->create(Baz::class, ['invalid']);
 
             $this->fail('Exception should have been raised');
         } catch (InvalidOptionsException $ex) {
@@ -48,7 +58,7 @@ class CascaderTest extends TestCase
      */
     public function it_creates_object_that_has_an_empty_constructor()
     {
-        $object = Cascader::create(MyClass::class, []);
+        $object = $this->cascader->create(MyClass::class, []);
 
         $this->assertInstanceOf(MyClass::class, $object);
     }
@@ -56,9 +66,9 @@ class CascaderTest extends TestCase
     /**
      * @test
      */
-    public function it_normalizes_option_keys_to_match_parameter_names_for_creation()
+    public function it_normalizes_creation_option_keys_to_match_constructor_parameter_names()
     {
-        $object = Cascader::create(Baz::class, [
+        $object = $this->cascader->create(Baz::class, [
             'name' => 'test',
             'count' => 10,
             'is_active' => false,
@@ -75,7 +85,7 @@ class CascaderTest extends TestCase
      */
     public function it_handles_optional_parameters_regardless_of_their_order()
     {
-        $object = Cascader::create(Baz::class, [
+        $object = $this->cascader->create(Baz::class, [
             'name' => 'test',
             'is_active' => true,
         ]);
@@ -92,7 +102,7 @@ class CascaderTest extends TestCase
     public function it_raises_exception_if_mandatory_parameter_is_not_provided_in_options()
     {
         try {
-            Cascader::create(Baz::class, [
+            $this->cascader->create(Baz::class, [
                 'count' => 10,
             ]);
 
@@ -107,7 +117,7 @@ class CascaderTest extends TestCase
      */
     public function it_creates_cascade_of_objects()
     {
-        $object = Cascader::create(Foo::class, [
+        $object = $this->cascader->create(Foo::class, [
             'bar' => [
                 'baz' => [
                     'name' => 'test',

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Cascader\Exception;
 
 use InvalidArgumentException;
+use BetterReflection\Reflection\ReflectionParameter;
 
 class InvalidOptionsException extends InvalidArgumentException implements ExceptionInterface
 {
@@ -13,12 +14,11 @@ class InvalidOptionsException extends InvalidArgumentException implements Except
         return new static('Options should be in form of an associate array (string keys)');
     }
 
-    public static function forMissingMandatoryParameter(string $className, string $parameterName)
+    public static function forMissingMandatoryParameter(ReflectionParameter $parameter)
     {
-        return new static(sprintf(
-            'Mandatory parameter: \'%2$s\' of class: %1$s is missing from options',
-            $className,
-            $parameterName
-        ));
+        $className = $parameter->getDeclaringClass()->getName();
+        $parameterName = $parameter->getName();
+
+        return new static(sprintf('Mandatory parameter: \'%2$s\' of class: %1$s is missing from options', $className, $parameterName));
     }
 }
