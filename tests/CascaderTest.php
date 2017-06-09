@@ -9,7 +9,9 @@ use Cascader\Cascader;
 use Cascader\Tests\TestAsset\Foo;
 use Cascader\Tests\TestAsset\Bar;
 use Cascader\Tests\TestAsset\Baz;
+use Cascader\Tests\TestAsset\AbstractClassAsset;
 use Cascader\Tests\TestAsset\InvokableAsset;
+use Cascader\Exception\InvalidClassException;
 use Cascader\Exception\InvalidOptionsException;
 
 class CascaderTest extends TestCase
@@ -37,6 +39,38 @@ class CascaderTest extends TestCase
         $this->assertInstanceOf(Baz::class, $object);
         $this->assertEquals('test', $object->name);
         $this->assertEquals(10, $object->count);
+    }
+
+    /**
+     * @test
+     */
+    public function it_raises_exception_if_class_does_not_exist()
+    {
+        try {
+            $this->cascader->create('NonExisting', [
+                'name' => 'test',
+            ]);
+
+            $this->fail('Exception should have been raised');
+        } catch (InvalidClassException $ex) {
+            $this->assertEquals('NonExisting class does not exist', $ex->getMessage());
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function it_raises_exception_if_class_cannot_be_instantiated()
+    {
+        try {
+            $this->cascader->create(AbstractClassAsset::class, [
+                'name' => 'test',
+            ]);
+
+            $this->fail('Exception should have been raised');
+        } catch (InvalidClassException $ex) {
+            $this->assertEquals('Cascader\Tests\TestAsset\AbstractClassAsset class cannot be instantiated', $ex->getMessage());
+        }
     }
 
     /**
