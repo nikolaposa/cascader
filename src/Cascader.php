@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Cascader;
 
 use BetterReflection\Reflection\ReflectionClass;
+use BetterReflection\Reflection\ReflectionParameter;
 use BetterReflection\Reflector\Exception\IdentifierNotFound;
 use Cascader\Exception\InvalidClassException;
 use Cascader\Exception\InvalidOptionsException;
 use Cascader\Exception\OptionNotSetException;
-use BetterReflection\Reflection\ReflectionParameter;
 use phpDocumentor\Reflection\Types\Object_;
 
 class Cascader
