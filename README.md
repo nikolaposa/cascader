@@ -18,7 +18,7 @@ composer require nikolaposa/cascader
 
 ## Usage
 
-``` php
+```php
 $cascader = new Cascader();
 
 $object = $cascader->create(RootObject::class, [
@@ -30,6 +30,8 @@ $object = $cascader->create(RootObject::class, [
     'is_active' => true,
 ]);
 ```
+
+See [more examples][link-examples].
 
 ## Credits
 
@@ -47,6 +49,7 @@ Released under MIT License - see the [License File](LICENSE) for details.
 [ico-code-quality]: https://img.shields.io/scrutinizer/g/nikolaposa/cascader.svg
 [ico-pds]: https://img.shields.io/badge/pds-skeleton-blue.svg
 
+[link-examples]: examples
 [link-packagist]: https://packagist.org/packages/nikolaposa/cascader
 [link-build]: https://travis-ci.org/nikolaposa/cascader
 [link-code-coverage]: https://scrutinizer-ci.com/g/nikolaposa/cascader/code-structure
