@@ -19,17 +19,15 @@ composer require nikolaposa/cascader
 ## Usage
 
 ``` php
-$object = Cascader::create(Foo::class, [
-    'bar' => [
-        'baz' => [
-            'name' => 'test',
-            'count' => 10,
-        ],
-        'config' => [
-            'key1' => 'val1',
-            'key2' => 'val2',
-        ],
+$cascader = new Cascader();
+
+$object = $cascader->create(RootObject::class, [
+    'name' => 'foo',
+    'sub_object' => [
+        'category' => 'bar',
+        'count' => 10,
     ],
+    'is_active' => true,
 ]);
 ```
 
