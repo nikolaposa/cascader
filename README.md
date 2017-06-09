@@ -6,7 +6,7 @@
 [![Latest Version][ico-version]][link-packagist]
 [![PDS Skeleton][ico-pds]][link-pds]
 
-Cascader enables the creation of PHP objects from the array that represents constructor parameters. Given the class name and creation options array, it will try to create a target object, also creating nested objects if necessary.
+Cascader enables the creation of objects from array definitions that represent constructor parameters. Given the class name and creation options array, it will try to create a target object, also creating nested objects that may exist. Convenient as a factory for generic kind of objects.
 
 ## Installation
 

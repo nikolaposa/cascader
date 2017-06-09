@@ -1,13 +1,14 @@
 {
     "name": "nikolaposa/cascader",
-    "description": "Utility for creating PHP objects from the array that represents constructor parameters.",
+    "description": "Utility for creating objects in PHP from constructor parameters definitions.",
     "type": "library",
     "license": "MIT",
     "keywords": [
         "instantiate",
-        "object",
-        "array",
-        "cascade"
+        "cascade",
+        "cascade-creation",
+        "generic",
+        "factory"
     ],
     "authors": [
         {
