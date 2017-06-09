@@ -9,7 +9,7 @@ use Cascader\Cascader;
 use Cascader\Tests\TestAsset\Foo;
 use Cascader\Tests\TestAsset\Bar;
 use Cascader\Tests\TestAsset\Baz;
-use Cascader\Tests\TestAsset\MyClass;
+use Cascader\Tests\TestAsset\InvokableAsset;
 use Cascader\Exception\InvalidOptionsException;
 
 class CascaderTest extends TestCase
@@ -58,9 +58,9 @@ class CascaderTest extends TestCase
      */
     public function it_creates_object_that_has_an_empty_constructor()
     {
-        $object = $this->cascader->create(MyClass::class, []);
+        $object = $this->cascader->create(InvokableAsset::class, []);
 
-        $this->assertInstanceOf(MyClass::class, $object);
+        $this->assertInstanceOf(InvokableAsset::class, $object);
     }
 
     /**
