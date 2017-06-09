@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Cascader\Tests\TestAsset;
 
-class Baz
+class SubObjectAsset
 {
     /**
      * @var string

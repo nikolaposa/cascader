@@ -6,9 +6,8 @@ namespace Cascader\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Cascader\Cascader;
-use Cascader\Tests\TestAsset\Foo;
-use Cascader\Tests\TestAsset\Bar;
-use Cascader\Tests\TestAsset\Baz;
+use Cascader\Tests\TestAsset\RootObjectAsset;
+use Cascader\Tests\TestAsset\SubObjectAsset;
 use Cascader\Tests\TestAsset\AbstractClassAsset;
 use Cascader\Tests\TestAsset\InvokableAsset;
 use Cascader\Exception\InvalidClassException;
@@ -31,12 +30,12 @@ class CascaderTest extends TestCase
      */
     public function it_creates_object_with_simple_creation_options()
     {
-        $object = $this->cascader->create(Baz::class, [
+        $object = $this->cascader->create(SubObjectAsset::class, [
             'name' => 'test',
             'count' => 10,
         ]);
 
-        $this->assertInstanceOf(Baz::class, $object);
+        $this->assertInstanceOf(SubObjectAsset::class, $object);
         $this->assertEquals('test', $object->name);
         $this->assertEquals(10, $object->count);
     }
@@ -79,7 +78,7 @@ class CascaderTest extends TestCase
     public function it_raises_exception_if_creation_options_is_not_associative_array()
     {
         try {
-            $this->cascader->create(Baz::class, ['invalid']);
+            $this->cascader->create(SubObjectAsset::class, ['invalid']);
 
             $this->fail('Exception should have been raised');
         } catch (InvalidOptionsException $ex) {
@@ -102,13 +101,13 @@ class CascaderTest extends TestCase
      */
     public function it_normalizes_creation_option_keys_to_match_constructor_parameter_names()
     {
-        $object = $this->cascader->create(Baz::class, [
+        $object = $this->cascader->create(SubObjectAsset::class, [
             'name' => 'test',
             'count' => 10,
             'is_active' => false,
         ]);
 
-        $this->assertInstanceOf(Baz::class, $object);
+        $this->assertInstanceOf(SubObjectAsset::class, $object);
         $this->assertEquals('test', $object->name);
         $this->assertEquals(10, $object->count);
         $this->assertFalse($object->isActive);
@@ -117,14 +116,31 @@ class CascaderTest extends TestCase
     /**
      * @test
      */
+    public function it_allows_option_to_be_set_in_any_order()
+    {
+        $object = $this->cascader->create(SubObjectAsset::class, [
+            'count' => 1,
+            'is_active' => false,
+            'name' => 'test',
+        ]);
+
+        $this->assertInstanceOf(SubObjectAsset::class, $object);
+        $this->assertEquals('test', $object->name);
+        $this->assertEquals(1, $object->count);
+        $this->assertFalse($object->isActive);
+    }
+
+    /**
+     * @test
+     */
     public function it_handles_optional_parameters_regardless_of_their_order()
     {
-        $object = $this->cascader->create(Baz::class, [
+        $object = $this->cascader->create(SubObjectAsset::class, [
             'name' => 'test',
             'is_active' => true,
         ]);
 
-        $this->assertInstanceOf(Baz::class, $object);
+        $this->assertInstanceOf(SubObjectAsset::class, $object);
         $this->assertEquals('test', $object->name);
         $this->assertEquals(3, $object->count);
         $this->assertTrue($object->isActive);
@@ -136,13 +152,13 @@ class CascaderTest extends TestCase
     public function it_raises_exception_if_mandatory_parameter_is_not_provided_in_options()
     {
         try {
-            $this->cascader->create(Baz::class, [
+            $this->cascader->create(SubObjectAsset::class, [
                 'count' => 10,
             ]);
 
             $this->fail('Exception should have been raised');
         } catch (InvalidOptionsException $ex) {
-            $this->assertEquals('Mandatory parameter: \'name\' of class: ' . Baz::class . ' is missing from options', $ex->getMessage());
+            $this->assertEquals('Mandatory parameter: \'name\' of class: ' . SubObjectAsset::class . ' is missing from options', $ex->getMessage());
         }
     }
 
@@ -151,28 +167,25 @@ class CascaderTest extends TestCase
      */
     public function it_creates_cascade_of_objects()
     {
-        $object = $this->cascader->create(Foo::class, [
-            'bar' => [
-                'baz' => [
-                    'name' => 'test',
-                    'count' => 10,
-                ],
-                'config' => [
-                    'key1' => 'val1',
-                    'key2' => 'val2',
-                ],
+        $object = $this->cascader->create(RootObjectAsset::class, [
+            'sub_object' => [
+                'name' => 'test',
+                'count' => 10,
+            ],
+            'data' => [
+                'key1' => 'val1',
+                'key2' => 'val2',
             ],
         ]);
 
-        $this->assertInstanceOf(Foo::class, $object);
-        $this->assertInstanceOf(Bar::class, $object->bar);
+        $this->assertInstanceOf(RootObjectAsset::class, $object);
+        $this->assertInstanceOf(SubObjectAsset::class, $object->subObject);
+        $this->assertEquals('test', $object->subObject->name);
+        $this->assertEquals(10, $object->subObject->count);
+        $this->assertTrue($object->subObject->isActive);
         $this->assertEquals([
             'key1' => 'val1',
             'key2' => 'val2',
-        ], $object->bar->config);
-        $this->assertInstanceOf(Baz::class, $object->bar->baz);
-        $this->assertEquals('test', $object->bar->baz->name);
-        $this->assertEquals(10, $object->bar->baz->count);
-        $this->assertTrue($object->bar->baz->isActive);
+        ], $object->data);
     }
 }
