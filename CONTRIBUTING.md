@@ -1,6 +1,6 @@
 # Contributing
 
-We accept contributions via Pull Requests on [Github](https://github.com/nikolaposa/cascader).
+Contributions are accepted via Pull Requests on [Github](https://github.com/nikolaposa/cascader).
 
 ## Running tests
 
