@@ -10,6 +10,6 @@ class OptionNotSetException extends RuntimeException implements ExceptionInterfa
 {
     public static function forKey(string $key)
     {
-        return new static(sprintf("Option '%s' is not set", $key));
+        return new self(sprintf("Option '%s' is not set", $key));
     }
 }

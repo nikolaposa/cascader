@@ -11,7 +11,7 @@ class InvalidOptionsException extends InvalidArgumentException implements Except
 {
     public static function forInvalidKeys()
     {
-        return new static('Options should be in form of an associate array (string keys)');
+        return new self('Options should be in form of an associate array (string keys)');
     }
 
     public static function forMissingMandatoryParameter(ReflectionParameter $parameter)
@@ -19,6 +19,6 @@ class InvalidOptionsException extends InvalidArgumentException implements Except
         $className = $parameter->getDeclaringClass()->getName();
         $parameterName = $parameter->getName();
 
-        return new static(sprintf('Mandatory parameter: \'%2$s\' of class: %1$s is missing from options', $className, $parameterName));
+        return new self(sprintf('Mandatory parameter: \'%2$s\' of class: %1$s is missing from options', $className, $parameterName));
     }
 }

@@ -10,11 +10,11 @@ class InvalidClassException extends RuntimeException implements ExceptionInterfa
 {
     public static function forNonExistingClass(string $className)
     {
-        return new static(sprintf('%s class does not exist', $className));
+        return new self(sprintf('%s class does not exist', $className));
     }
 
     public static function forNonInstantiableClass(string $className)
     {
-        return new static(sprintf('%s class cannot be instantiated', $className));
+        return new self(sprintf('%s class cannot be instantiated', $className));
     }
 }
