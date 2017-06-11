@@ -41,9 +41,10 @@ class Options
         $normalizedOptions = [];
 
         foreach ($options as $key => $value) {
+            $normalizedOptions[$key] = $value;
+
             $normalizedKey = str_replace(' ', '', ucwords(str_replace(['_', '-'], ' ', $key)));
             $normalizedKey[0] = strtolower($normalizedKey[0]);
-
             $normalizedOptions[$normalizedKey] = $value;
         }
 

@@ -99,7 +99,7 @@ class CascaderTest extends TestCase
     /**
      * @test
      */
-    public function it_normalizes_creation_option_keys_to_match_constructor_parameter_names()
+    public function it_creates_object_regardless_of_options_casing()
     {
         $object = $this->cascader->create(SubObjectAsset::class, [
             'name' => 'test',
