@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Cascader\Exception;
 
-use BetterReflection\Reflection\ReflectionParameter;
 use InvalidArgumentException;
+use ReflectionParameter;
 
 class InvalidOptionsException extends InvalidArgumentException implements ExceptionInterface
 {

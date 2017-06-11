@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Cascader;
 
-use BetterReflection\Reflection\ReflectionClass;
-use BetterReflection\Reflection\ReflectionParameter;
-use BetterReflection\Reflector\Exception\IdentifierNotFound;
 use Cascader\Exception\InvalidClassException;
 use Cascader\Exception\InvalidOptionsException;
 use Cascader\Exception\OptionNotSetException;
-use phpDocumentor\Reflection\Types\Object_;
+use ReflectionClass;
+use ReflectionParameter;
 
 class Cascader
 {
@@ -33,11 +31,11 @@ class Cascader
         return new $className(...$arguments);
     }
 
-    protected function getReflectionClass(string $className)
+    protected function getReflectionClass(string $className) : ReflectionClass
     {
         try {
-            $reflectionClass = ReflectionClass::createFromName($className);
-        } catch (IdentifierNotFound $ex) {
+            $reflectionClass = new ReflectionClass($className);
+        } catch (\ReflectionException $ex) {
             throw InvalidClassException::forNonExistingClass($className);
         }
 
@@ -50,13 +48,15 @@ class Cascader
 
     protected function marshalArguments(ReflectionClass $reflectionClass, Options $options) : array
     {
-        if (! $reflectionClass->hasMethod('__construct')) {
+        $constructor = $reflectionClass->getConstructor();
+
+        if (null === $constructor) {
             return [];
         }
 
         $arguments = [];
 
-        $constructorParameters = $reflectionClass->getConstructor()->getParameters();
+        $constructorParameters = $constructor->getParameters();
 
         foreach ($constructorParameters as $parameter) {
             $arguments[] = $this->resolveArgument($parameter, $options);
@@ -71,10 +71,8 @@ class Cascader
             $argument = $options->get($parameter->getName());
 
             if (null !== ($parameterType = $parameter->getType())) {
-                $parameterTypeObject = $parameterType->getTypeObject();
-
-                if (is_array($argument) && $parameterTypeObject instanceof Object_) {
-                    $argument = $this->create((string) $parameterTypeObject->getFqsen(), $argument);
+                if (is_array($argument) && ! $parameterType->isBuiltin()) {
+                    $argument = $this->create((string) $parameterType, $argument);
                 }
             }
 
