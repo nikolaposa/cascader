@@ -68,7 +68,7 @@ class Cascader
     protected function resolveArgument(ReflectionParameter $parameter, Options $options)
     {
         try {
-            $argument = $options->get($parameter->getName());
+            $argument = $options->get($parameter->name);
 
             if (null !== ($parameterType = $parameter->getType())) {
                 if (is_array($argument) && ! $parameterType->isBuiltin()) {

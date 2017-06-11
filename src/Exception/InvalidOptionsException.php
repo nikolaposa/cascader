@@ -16,7 +16,7 @@ class InvalidOptionsException extends InvalidArgumentException implements Except
 
     public static function forMissingMandatoryParameter(ReflectionParameter $parameter)
     {
-        $className = $parameter->getDeclaringClass()->getName();
+        $className = $parameter->getDeclaringClass()->name;
         $parameterName = $parameter->getName();
 
         return new self(sprintf('Mandatory parameter: \'%2$s\' of class: %1$s is missing from options', $className, $parameterName));
