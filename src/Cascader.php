@@ -71,8 +71,9 @@ class Cascader
             $argument = $options->get($parameter->name);
 
             if (null !== ($parameterType = $parameter->getType())) {
-                if (is_array($argument) && ! $parameterType->isBuiltin()) {
-                    $argument = $this->create((string) $parameterType, $argument);
+                if (\is_array($argument) && ! $parameterType->isBuiltin()) {
+                    list($class, $arguments) = $this->resolveClass((string)$parameterType, $argument);
+                    $argument = $this->create($class, $arguments);
                 }
             }
 
@@ -84,5 +85,13 @@ class Cascader
 
             return $parameter->getDefaultValue();
         }
+    }
+
+    protected function resolveClass(string $class, array $arguments = []): array
+    {
+        $class = $arguments['__class__'] ?? $class;
+        unset($arguments['__class__']);
+
+        return [$class, $arguments];
     }
 }

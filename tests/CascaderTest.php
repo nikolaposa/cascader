@@ -188,4 +188,40 @@ class CascaderTest extends TestCase
             'key2' => 'val2',
         ], $object->data);
     }
+
+    /**
+     * @test
+     * @throws \ReflectionException
+     *
+     * @dataProvider dataProviderForResolveClass
+     */
+    public function it_resolve_subject_class(array $expected, string $class, array $arguments = [])
+    {
+        $method = new \ReflectionMethod(Cascader::class, 'resolveClass');
+        $method->setAccessible(true);
+        $actual = $method->invoke($this->cascader, $class, $arguments);
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function dataProviderForResolveClass(): array
+    {
+        return [
+            'general' => [
+                ['Some\ClassName', ['arg1' => 1, 'arg2' => true]],
+                'Some\ClassName',
+                ['arg1' => 1, 'arg2' => true]
+            ],
+            'instead interface' => [
+                ['Some\ConcreteClass', ['arg' => 'value']],
+                'Some\SomeInterface',
+                ['__class__' => 'Some\ConcreteClass', 'arg' => 'value']
+            ],
+            'replace class from declarate type' => [
+                ['Some\ReplaceClass', ['arg' => 'value']],
+                'Some\DeclarateArgumentClass',
+                ['__class__' => 'Some\ReplaceClass', 'arg' => 'value']
+            ],
+        ];
+    }
 }
