@@ -9,6 +9,7 @@ use Cascader\Exception\InvalidOptionsException;
 use Cascader\Exception\OptionNotSetException;
 use ReflectionClass;
 use ReflectionParameter;
+use ReflectionType;
 
 class Cascader
 {
@@ -70,11 +71,8 @@ class Cascader
         try {
             $argument = $options->get($parameter->name);
 
-            if (null !== ($parameterType = $parameter->getType())) {
-                if (\is_array($argument) && ! $parameterType->isBuiltin()) {
-                    list($class, $arguments) = $this->resolveClass((string)$parameterType, $argument);
-                    $argument = $this->create($class, $arguments);
-                }
+            if (null !== ($parameterType = $parameter->getType()) && $this->shouldResolveObjectArgument($parameterType, $argument)) {
+                $argument = $this->resolveObjectArgument((string) $parameterType, $argument);
             }
 
             return $argument;
@@ -87,11 +85,18 @@ class Cascader
         }
     }
 
-    protected function resolveClass(string $class, array $arguments = []): array
+    protected function shouldResolveObjectArgument(ReflectionType $parameterType, $argument) : bool
     {
-        $class = $arguments['__class__'] ?? $class;
-        unset($arguments['__class__']);
+        return !$parameterType->isBuiltin() && \is_array($argument);
+    }
 
-        return [$class, $arguments];
+    protected function resolveObjectArgument(string $className, array $arguments)
+    {
+        if (isset($arguments['__class__'])) {
+            $className = $arguments['__class__'];
+            unset($arguments['__class__']);
+        }
+
+        return $this->create($className, $arguments);
     }
 }

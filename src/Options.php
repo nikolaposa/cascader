@@ -30,7 +30,7 @@ class Options
     final protected static function validate(array $options)
     {
         foreach ($options as $key => $value) {
-            if (! is_string($key)) {
+            if (! \is_string($key)) {
                 throw InvalidOptionsException::forInvalidKeys();
             }
         }

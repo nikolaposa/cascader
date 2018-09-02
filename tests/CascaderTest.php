@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Cascader\Tests;
 
+use Cascader\Tests\TestAsset\CustomSubObjectAsset;
 use PHPUnit\Framework\TestCase;
 use Cascader\Cascader;
 use Cascader\Tests\TestAsset\RootObjectAsset;
@@ -36,8 +37,8 @@ class CascaderTest extends TestCase
         ]);
 
         $this->assertInstanceOf(SubObjectAsset::class, $object);
-        $this->assertEquals('test', $object->name);
-        $this->assertEquals(10, $object->count);
+        $this->assertSame('test', $object->name);
+        $this->assertSame(10, $object->count);
     }
 
     /**
@@ -52,7 +53,7 @@ class CascaderTest extends TestCase
 
             $this->fail('Exception should have been raised');
         } catch (InvalidClassException $ex) {
-            $this->assertEquals('NonExisting class does not exist', $ex->getMessage());
+            $this->assertSame('NonExisting class does not exist', $ex->getMessage());
         }
     }
 
@@ -68,7 +69,7 @@ class CascaderTest extends TestCase
 
             $this->fail('Exception should have been raised');
         } catch (InvalidClassException $ex) {
-            $this->assertEquals('Cascader\Tests\TestAsset\AbstractClassAsset class cannot be instantiated', $ex->getMessage());
+            $this->assertSame('Cascader\Tests\TestAsset\AbstractClassAsset class cannot be instantiated', $ex->getMessage());
         }
     }
 
@@ -82,7 +83,7 @@ class CascaderTest extends TestCase
 
             $this->fail('Exception should have been raised');
         } catch (InvalidOptionsException $ex) {
-            $this->assertEquals('Options should be in form of an associate array (string keys)', $ex->getMessage());
+            $this->assertSame('Options should be in form of an associate array (string keys)', $ex->getMessage());
         }
     }
 
@@ -108,8 +109,8 @@ class CascaderTest extends TestCase
         ]);
 
         $this->assertInstanceOf(SubObjectAsset::class, $object);
-        $this->assertEquals('test', $object->name);
-        $this->assertEquals(10, $object->count);
+        $this->assertSame('test', $object->name);
+        $this->assertSame(10, $object->count);
         $this->assertFalse($object->isActive);
     }
 
@@ -125,8 +126,8 @@ class CascaderTest extends TestCase
         ]);
 
         $this->assertInstanceOf(SubObjectAsset::class, $object);
-        $this->assertEquals('test', $object->name);
-        $this->assertEquals(1, $object->count);
+        $this->assertSame('test', $object->name);
+        $this->assertSame(1, $object->count);
         $this->assertFalse($object->isActive);
     }
 
@@ -141,8 +142,8 @@ class CascaderTest extends TestCase
         ]);
 
         $this->assertInstanceOf(SubObjectAsset::class, $object);
-        $this->assertEquals('test', $object->name);
-        $this->assertEquals(3, $object->count);
+        $this->assertSame('test', $object->name);
+        $this->assertSame(3, $object->count);
         $this->assertTrue($object->isActive);
     }
 
@@ -158,14 +159,14 @@ class CascaderTest extends TestCase
 
             $this->fail('Exception should have been raised');
         } catch (InvalidOptionsException $ex) {
-            $this->assertEquals('Mandatory parameter: \'name\' of class: ' . SubObjectAsset::class . ' is missing from options', $ex->getMessage());
+            $this->assertSame('Mandatory parameter: \'name\' of class: ' . SubObjectAsset::class . ' is missing from options', $ex->getMessage());
         }
     }
 
     /**
      * @test
      */
-    public function it_creates_cascade_of_objects()
+    public function it_handles_creation_of_object_arguments()
     {
         $object = $this->cascader->create(RootObjectAsset::class, [
             'sub_object' => [
@@ -180,10 +181,10 @@ class CascaderTest extends TestCase
 
         $this->assertInstanceOf(RootObjectAsset::class, $object);
         $this->assertInstanceOf(SubObjectAsset::class, $object->subObject);
-        $this->assertEquals('test', $object->subObject->name);
-        $this->assertEquals(10, $object->subObject->count);
+        $this->assertSame('test', $object->subObject->name);
+        $this->assertSame(10, $object->subObject->count);
         $this->assertTrue($object->subObject->isActive);
-        $this->assertEquals([
+        $this->assertSame([
             'key1' => 'val1',
             'key2' => 'val2',
         ], $object->data);
@@ -191,37 +192,24 @@ class CascaderTest extends TestCase
 
     /**
      * @test
-     * @throws \ReflectionException
-     *
-     * @dataProvider dataProviderForResolveClass
      */
-    public function it_resolve_subject_class(array $expected, string $class, array $arguments = [])
+    public function it_allows_passing_custom_concrete_class_name_for_objects_via_arguments()
     {
-        $method = new \ReflectionMethod(Cascader::class, 'resolveClass');
-        $method->setAccessible(true);
-        $actual = $method->invoke($this->cascader, $class, $arguments);
+        $object = $this->cascader->create(RootObjectAsset::class, [
+            'sub_object' => [
+                '__class__' => CustomSubObjectAsset::class,
+                'name' => 'test',
+                'count' => 10,
+            ],
+            'data' => [
+                'key1' => 'val1',
+                'key2' => 'val2',
+            ],
+        ]);
 
-        $this->assertSame($expected, $actual);
-    }
-
-    public function dataProviderForResolveClass(): array
-    {
-        return [
-            'general' => [
-                ['Some\ClassName', ['arg1' => 1, 'arg2' => true]],
-                'Some\ClassName',
-                ['arg1' => 1, 'arg2' => true]
-            ],
-            'instead interface' => [
-                ['Some\ConcreteClass', ['arg' => 'value']],
-                'Some\SomeInterface',
-                ['__class__' => 'Some\ConcreteClass', 'arg' => 'value']
-            ],
-            'replace class from declarate type' => [
-                ['Some\ReplaceClass', ['arg' => 'value']],
-                'Some\DeclarateArgumentClass',
-                ['__class__' => 'Some\ReplaceClass', 'arg' => 'value']
-            ],
-        ];
+        $this->assertInstanceOf(RootObjectAsset::class, $object);
+        $this->assertInstanceOf(CustomSubObjectAsset::class, $object->subObject);
+        $this->assertSame('test', $object->subObject->name);
+        $this->assertSame(10, $object->subObject->count);
     }
 }
