@@ -215,12 +215,12 @@ class CascaderTest extends TestCase
             'instead interface' => [
                 ['Some\ConcreteClass', ['arg' => 'value']],
                 'Some\SomeInterface',
-                ['__class__' => 'Some\ConcreteClass', 'options' => ['arg' => 'value']]
+                ['__class__' => 'Some\ConcreteClass', 'arg' => 'value']
             ],
             'replace class from declarate type' => [
                 ['Some\ReplaceClass', ['arg' => 'value']],
                 'Some\DeclarateArgumentClass',
-                ['__class__' => 'Some\ReplaceClass', 'options' => ['arg' => 'value']]
+                ['__class__' => 'Some\ReplaceClass', 'arg' => 'value']
             ],
         ];
     }

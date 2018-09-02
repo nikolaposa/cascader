@@ -90,7 +90,7 @@ class Cascader
     protected function resolveClass(string $class, array $arguments = []): array
     {
         $class = $arguments['__class__'] ?? $class;
-        $arguments = isset($arguments['__class__'], $arguments['options']) ? $arguments['options'] : $arguments;
+        unset($arguments['__class__']);
 
         return [$class, $arguments];
     }
