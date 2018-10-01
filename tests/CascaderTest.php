@@ -238,13 +238,13 @@ class CascaderTest extends TestCase
         $this->assertInternalType('array', $object->child);
         $this->assertCount(2, $object->child);
 
-        $this->assertInstanceOf(SubObjectAsset::class, $object->child[0]);
-        $this->assertSame('test', $object->child[0]->name);
-        $this->assertSame(10, $object->child[0]->count);
+        $child = $object->child;
+        $this->assertInstanceOf(SubObjectAsset::class, $child[0]);
+        $this->assertSame('test', $child[0]->name);
+        $this->assertSame(10, $child[0]->count);
 
-        $this->assertInstanceOf(SubObjectAsset::class, $object->child[1]);
-        $this->assertSame('test2', $object->child[1]->name);
-        $this->assertSame(20, $object->child[1]->count);
-
+        $this->assertInstanceOf(SubObjectAsset::class, $child[1]);
+        $this->assertSame('test2', $child[1]->name);
+        $this->assertSame(20, $child[1]->count);
     }
 }
