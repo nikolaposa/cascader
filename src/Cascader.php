@@ -71,6 +71,10 @@ class Cascader
         try {
             $argument = $options->get($parameter->name);
 
+            if ((string)$parameter->getType() === 'array') {
+                return $this->resoleArrayArgument($argument);
+            }
+
             if (null !== ($parameterType = $parameter->getType()) && $this->shouldResolveObjectArgument($parameterType, $argument)) {
                 $argument = $this->resolveObjectArgument((string) $parameterType, $argument);
             }
@@ -83,6 +87,17 @@ class Cascader
 
             return $parameter->getDefaultValue();
         }
+    }
+
+    protected function resoleArrayArgument(array $argument = []): array
+    {
+        foreach ($argument as $k => $value) {
+            if (\is_array($value) && isset($value['__class__'])) {
+                $argument[$k] = $this->resolveObjectArgument('', $value);
+            }
+        }
+
+        return $argument;
     }
 
     protected function shouldResolveObjectArgument(ReflectionType $parameterType, $argument) : bool
