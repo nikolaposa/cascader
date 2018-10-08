@@ -6,14 +6,14 @@ namespace Cascader\Exception;
 
 use RuntimeException;
 
-class InvalidClassException extends RuntimeException implements ExceptionInterface
+final class InvalidClassException extends RuntimeException implements ExceptionInterface
 {
-    public static function forNonExistingClass(string $className)
+    public static function nonExistingClass(string $className)
     {
         return new self(sprintf('%s class does not exist', $className));
     }
 
-    public static function forNonInstantiableClass(string $className)
+    public static function nonInstantiableClass(string $className)
     {
         return new self(sprintf('%s class cannot be instantiated', $className));
     }

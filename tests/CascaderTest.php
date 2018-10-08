@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Cascader\Tests;
 
-use Cascader\Tests\TestAsset\ArraySubObjectsAsset;
+use Cascader\Tests\TestAsset\SubObjectsCollectionAsset;
 use Cascader\Tests\TestAsset\CustomSubObjectAsset;
 use PHPUnit\Framework\TestCase;
 use Cascader\Cascader;
@@ -194,11 +194,11 @@ class CascaderTest extends TestCase
     /**
      * @test
      */
-    public function it_allows_passing_custom_concrete_class_name_for_objects_via_arguments()
+    public function it_allows_passing_concrete_class_name_for_objects_via_arguments()
     {
         $object = $this->cascader->create(RootObjectAsset::class, [
             'sub_object' => [
-                '__class__' => CustomSubObjectAsset::class,
+                Cascader::ARGUMENT_CLASS => CustomSubObjectAsset::class,
                 'name' => 'test',
                 'count' => 10,
             ],
@@ -217,34 +217,30 @@ class CascaderTest extends TestCase
     /**
      * @test
      */
-    public function it_allows_passing_custom_concrete_class_name_for_array_via_arguments()
+    public function it_allows_passing_concrete_class_name_for_sub_object_collections()
     {
-        $object = $this->cascader->create(ArraySubObjectsAsset::class, [
-            'child' => [
-                0 => [
-                    '__class__' => CustomSubObjectAsset::class,
+        $object = $this->cascader->create(SubObjectsCollectionAsset::class, [
+            'collection' => [
+                [
+                    Cascader::ARGUMENT_CLASS => CustomSubObjectAsset::class,
                     'name' => 'test',
                     'count' => 10,
                 ],
-                1 => [
-                    '__class__' => CustomSubObjectAsset::class,
+                [
+                    Cascader::ARGUMENT_CLASS => CustomSubObjectAsset::class,
                     'name' => 'test2',
                     'count' => 20,
                 ]
             ]
         ]);
 
-        $this->assertInstanceOf(ArraySubObjectsAsset::class, $object);
-        $this->assertInternalType('array', $object->child);
-        $this->assertCount(2, $object->child);
-
-        $child = $object->child;
-        $this->assertInstanceOf(SubObjectAsset::class, $child[0]);
-        $this->assertSame('test', $child[0]->name);
-        $this->assertSame(10, $child[0]->count);
-
-        $this->assertInstanceOf(SubObjectAsset::class, $child[1]);
-        $this->assertSame('test2', $child[1]->name);
-        $this->assertSame(20, $child[1]->count);
+        $this->assertInstanceOf(SubObjectsCollectionAsset::class, $object);
+        $this->assertCount(2, $object->collection);
+        $this->assertInstanceOf(SubObjectAsset::class, $object->collection[0]);
+        $this->assertSame('test', $object->collection[0]->name);
+        $this->assertSame(10, $object->collection[0]->count);
+        $this->assertInstanceOf(SubObjectAsset::class, $object->collection[1]);
+        $this->assertSame('test2', $object->collection[1]->name);
+        $this->assertSame(20, $object->collection[1]->count);
     }
 }

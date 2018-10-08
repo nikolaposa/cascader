@@ -4,21 +4,22 @@ declare(strict_types=1);
 
 namespace Cascader\Exception;
 
+use Cascader\ParameterAnalysis;
 use InvalidArgumentException;
-use ReflectionParameter;
 
-class InvalidOptionsException extends InvalidArgumentException implements ExceptionInterface
+final class InvalidOptionsException extends InvalidArgumentException implements ExceptionInterface
 {
-    public static function forInvalidKeys()
+    public static function invalidKeys()
     {
         return new self('Options should be in form of an associate array (string keys)');
     }
 
-    public static function forMissingMandatoryParameter(ReflectionParameter $parameter)
+    public static function missingMandatoryParameter(ParameterAnalysis $parameterAnalysis)
     {
-        $className = $parameter->getDeclaringClass()->name;
-        $parameterName = $parameter->getName();
-
-        return new self(sprintf('Mandatory parameter: \'%2$s\' of class: %1$s is missing from options', $className, $parameterName));
+        return new self(sprintf(
+            'Mandatory parameter: \'%2$s\' of class: %1$s is missing from options',
+            $parameterAnalysis->getDeclaringClass(),
+            $parameterAnalysis->getName()
+        ));
     }
 }

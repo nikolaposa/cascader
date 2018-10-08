@@ -6,13 +6,13 @@ namespace Cascader;
 
 use Cascader\Exception\InvalidClassException;
 use Cascader\Exception\InvalidOptionsException;
-use Cascader\Exception\OptionNotSetException;
 use ReflectionClass;
 use ReflectionParameter;
-use ReflectionType;
 
 class Cascader
 {
+    const ARGUMENT_CLASS = '__class__';
+
     /**
      * @param string $className
      * @param array $options
@@ -27,7 +27,7 @@ class Cascader
         $reflectionClass = $this->getReflectionClass($className);
         $options = Options::fromArray($options);
 
-        $arguments = $this->marshalArguments($reflectionClass, $options);
+        $arguments = $this->resolveArguments($reflectionClass, $options);
 
         return new $className(...$arguments);
     }
@@ -37,17 +37,17 @@ class Cascader
         try {
             $reflectionClass = new ReflectionClass($className);
         } catch (\ReflectionException $ex) {
-            throw InvalidClassException::forNonExistingClass($className);
+            throw InvalidClassException::nonExistingClass($className);
         }
 
         if (! $reflectionClass->isInstantiable()) {
-            throw InvalidClassException::forNonInstantiableClass($className);
+            throw InvalidClassException::nonInstantiableClass($className);
         }
 
         return $reflectionClass;
     }
 
-    protected function marshalArguments(ReflectionClass $reflectionClass, Options $options) : array
+    protected function resolveArguments(ReflectionClass $reflectionClass, Options $options) : array
     {
         $constructor = $reflectionClass->getConstructor();
 
@@ -66,50 +66,47 @@ class Cascader
         return $arguments;
     }
 
-    protected function resolveArgument(ReflectionParameter $parameter, Options $options)
+    protected function resolveArgument(ReflectionParameter $reflectionParameter, Options $options)
     {
-        try {
-            $argument = $options->get($parameter->name);
+        $parameterAnalysis = new ParameterAnalysis($reflectionParameter, $options);
 
-            if ((string)$parameter->getType() === 'array') {
-                return $this->resoleArrayArgument($argument);
+        if (! $parameterAnalysis->hasArgument()) {
+            if (! $parameterAnalysis->isOptional()) {
+                throw InvalidOptionsException::missingMandatoryParameter($parameterAnalysis);
             }
 
-            if (null !== ($parameterType = $parameter->getType()) && $this->shouldResolveObjectArgument($parameterType, $argument)) {
-                $argument = $this->resolveObjectArgument((string) $parameterType, $argument);
-            }
-
-            return $argument;
-        } catch (OptionNotSetException $ex) {
-            if (! $parameter->isOptional()) {
-                throw InvalidOptionsException::forMissingMandatoryParameter($parameter);
-            }
-
-            return $parameter->getDefaultValue();
+            return $parameterAnalysis->getDefaultValue();
         }
+
+        $argument = $parameterAnalysis->getArgument();
+
+        if ($parameterAnalysis->isArray()) {
+            return $this->resolveArrayArgument($argument);
+        }
+
+        if ($parameterAnalysis->isNestedObject()) {
+            return $this->createNestedObject($parameterAnalysis->getType(), $argument);
+        }
+
+        return $argument;
     }
 
-    protected function resoleArrayArgument(array $argument = []): array
+    protected function resolveArrayArgument(array $argument) : array
     {
         foreach ($argument as $k => $value) {
-            if (\is_array($value) && isset($value['__class__'])) {
-                $argument[$k] = $this->resolveObjectArgument('', $value);
+            if (\is_array($value) && isset($value[self::ARGUMENT_CLASS])) {
+                $argument[$k] = $this->createNestedObject('', $value);
             }
         }
 
         return $argument;
     }
 
-    protected function shouldResolveObjectArgument(ReflectionType $parameterType, $argument) : bool
+    protected function createNestedObject(string $className, array $arguments)
     {
-        return !$parameterType->isBuiltin() && \is_array($argument);
-    }
-
-    protected function resolveObjectArgument(string $className, array $arguments)
-    {
-        if (isset($arguments['__class__'])) {
-            $className = $arguments['__class__'];
-            unset($arguments['__class__']);
+        if (isset($arguments[self::ARGUMENT_CLASS])) {
+            $className = $arguments[self::ARGUMENT_CLASS];
+            unset($arguments[self::ARGUMENT_CLASS]);
         }
 
         return $this->create($className, $arguments);

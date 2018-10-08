@@ -31,7 +31,7 @@ class Options
     {
         foreach ($options as $key => $value) {
             if (! \is_string($key)) {
-                throw InvalidOptionsException::forInvalidKeys();
+                throw InvalidOptionsException::invalidKeys();
             }
         }
     }

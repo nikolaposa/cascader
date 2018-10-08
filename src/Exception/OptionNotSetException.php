@@ -6,7 +6,7 @@ namespace Cascader\Exception;
 
 use RuntimeException;
 
-class OptionNotSetException extends RuntimeException implements ExceptionInterface
+final class OptionNotSetException extends RuntimeException implements ExceptionInterface
 {
     public static function forKey(string $key)
     {
