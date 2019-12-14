@@ -7,7 +7,7 @@ namespace Cascader;
 use Cascader\Exception\InvalidOptionsException;
 use Cascader\Exception\OptionNotSetException;
 
-class Options
+final class Options
 {
     /**
      * @var array
