@@ -14,7 +14,7 @@ class Options
      */
     protected $options;
 
-    protected function __construct(array $options)
+    final protected function __construct(array $options)
     {
         $this->options = $options;
     }
