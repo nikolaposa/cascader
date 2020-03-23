@@ -44,14 +44,14 @@ Released under MIT License - see the [License File](LICENSE) for details.
 
 
 [ico-version]: https://img.shields.io/packagist/v/nikolaposa/cascader.svg
-[ico-build]: https://travis-ci.org/nikolaposa/cascader.svg?branch=master
+[ico-build]: https://travis-ci.com/nikolaposa/cascader.svg?branch=master
 [ico-code-coverage]: https://img.shields.io/scrutinizer/coverage/g/nikolaposa/cascader.svg
 [ico-code-quality]: https://img.shields.io/scrutinizer/g/nikolaposa/cascader.svg
 [ico-pds]: https://img.shields.io/badge/pds-skeleton-blue.svg
 
 [link-examples]: examples
 [link-packagist]: https://packagist.org/packages/nikolaposa/cascader
-[link-build]: https://travis-ci.org/nikolaposa/cascader
+[link-build]: https://travis-ci.com/nikolaposa/cascader
 [link-code-coverage]: https://scrutinizer-ci.com/g/nikolaposa/cascader/code-structure
 [link-code-quality]: https://scrutinizer-ci.com/g/nikolaposa/cascader
 [link-pds]: https://github.com/php-pds/skeleton
