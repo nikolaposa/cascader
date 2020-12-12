@@ -22,7 +22,7 @@ class CascaderTest extends TestCase
      */
     protected $cascader;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->cascader = new Cascader();
     }
