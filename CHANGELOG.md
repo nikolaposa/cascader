@@ -17,4 +17,4 @@ All notable changes to this project will be documented in this file.
 - [3: Allow passing custom concrete class name for object arguments via special `__class__` argument](https://github.com/nikolaposa/cascader/pull/3)
 
 
-[Unreleased]: https://github.com/nikolaposa/version/compare/1.2.0...HEAD
+[Unreleased]: https://github.com/nikolaposa/version/compare/1.3.0...HEAD
