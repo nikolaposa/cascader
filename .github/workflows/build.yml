@@ -18,7 +18,7 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - 7.0
+          - 7.2
 
     steps:
       - name: Checkout
@@ -55,9 +55,10 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - 7.0
-          - 7.1
           - 7.2
+          - 7.3
+          - 7.4
+          - 8.0
 
     steps:
       - name: Checkout
@@ -94,7 +95,7 @@ jobs:
     strategy:
       matrix:
         php-version:
-          - 7.0
+          - 7.2
 
     steps:
       - name: Checkout commit
